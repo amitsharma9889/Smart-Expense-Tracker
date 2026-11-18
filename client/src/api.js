@@ -1,7 +1,6 @@
-const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "http://localhost:5000" : "https://expensex-backend-t5mx.onrender.com")
-).replace(/\/+$/, "");
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "https://expensex-backend-t5mx.onrender.com")
+  .replace(/\/+$/, "");
+const API_URL = API_BASE_URL.endsWith("/api") ? API_BASE_URL : `${API_BASE_URL}/api`;
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem("expensetrackerToken");
