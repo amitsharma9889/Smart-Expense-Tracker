@@ -15,7 +15,8 @@ const port = Number(process.env.PORT) || 5000;
 app.use(
   cors({
     origin: [
-      "https://smart-expense-tracker-seven-psi.vercel.app/",
+      "https://smart-expense-tracker-seven-psi.vercel.app", // Yeh naya wala add karein
+      "https://client-five-zeta-73.vercel.app",
       "http://localhost:5173",
       "http://127.0.0.1:5173"
     ],
