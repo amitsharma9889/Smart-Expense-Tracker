@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       select: false
+    },
+    isGuest: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }

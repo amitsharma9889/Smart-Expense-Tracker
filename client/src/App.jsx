@@ -47,6 +47,23 @@ function AuthPage({ onAuthenticated }) {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  async function continueAsGuest() {
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const result = await apiRequest("/auth/guest", {
+        method: "POST",
+        body: JSON.stringify({})
+      });
+      onAuthenticated(result);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function submitForm(event) {
     event.preventDefault();
     setError("");
@@ -102,7 +119,11 @@ function AuthPage({ onAuthenticated }) {
             {submitting ? "Please wait…" : mode === "register" ? "Create account" : "Sign in"}
           </button>
         </form>
-        <p className="auth-privacy">Your account data is private to your sign-in.</p>
+        <div className="auth-divider"><span>OR</span></div>
+        <button type="button" className="button button-secondary auth-guest" onClick={continueAsGuest} disabled={submitting}>
+          {submitting ? "Please wait…" : "Continue as guest"}
+        </button>
+        <p className="auth-privacy">Guest access opens a shared demo workspace. Please don’t enter personal information.</p>
       </section>
     </main>
   );
@@ -419,7 +440,7 @@ function App() {
           </div>
           <div className="profile">
             <div className="profile-avatar">{initials(user.name)}</div>
-            <div className="profile-details"><strong>{user.name}</strong><span>{user.email}</span></div>
+            <div className="profile-details"><strong>{user.isGuest ? "Guest account" : user.name}</strong><span>{user.email}</span></div>
             <button className="logout-button" onClick={logout} title="Sign out" aria-label="Sign out">↪</button>
           </div>
         </div>

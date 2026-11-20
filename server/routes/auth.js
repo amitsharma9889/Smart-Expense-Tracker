@@ -1,8 +1,10 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { randomBytes } from "node:crypto";
 import User from "../models/User.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { seedDemoData } from "../utils/demoData.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
@@ -19,7 +21,8 @@ function publicUser(user) {
   return {
     id: user._id,
     name: user.name,
-    email: user.email
+    email: user.email,
+    isGuest: user.isGuest
   };
 }
 
@@ -33,6 +36,9 @@ router.post("/register", asyncHandler(async (request, response) => {
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail) || cleanEmail.length > 160) {
     return response.status(400).json({ message: "Enter a valid email address." });
+  }
+  if (cleanEmail === "guest@expensex.demo") {
+    return response.status(400).json({ message: "That email address is reserved for guest access." });
   }
   if (typeof password !== "string" || password.length < 8 || password.length > 72) {
     return response.status(400).json({ message: "Choose a password between 8 and 72 characters." });
@@ -53,6 +59,39 @@ router.post("/login", asyncHandler(async (request, response) => {
 
   if (!user || typeof password !== "string" || !(await bcrypt.compare(password, user.passwordHash))) {
     return response.status(401).json({ message: "Email or password is incorrect." });
+  }
+
+  return response.json({
+    token: makeToken(user),
+    user: publicUser(user)
+  });
+}));
+
+router.post("/guest", asyncHandler(async (_request, response) => {
+  let user = await User.findOne({ email: "guest@expensex.demo", isGuest: true });
+  let isNewGuest = false;
+  if (!user) {
+    try {
+      user = await User.create({
+        name: "Guest Interviewer",
+        email: "guest@expensex.demo",
+        passwordHash: await bcrypt.hash(randomBytes(32).toString("hex"), 12),
+        isGuest: true
+      });
+      isNewGuest = true;
+    } catch (error) {
+      if (error.code !== 11000) {
+        throw error;
+      }
+      user = await User.findOne({ email: "guest@expensex.demo", isGuest: true });
+      if (!user) {
+        throw error;
+      }
+    }
+  }
+
+  if (isNewGuest) {
+    await seedDemoData(user);
   }
 
   return response.json({

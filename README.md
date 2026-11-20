@@ -6,6 +6,7 @@ A small full-stack expense tracker for keeping customer records and recording ex
 
 - Add, edit, and delete customer records.
 - Create an account and sign in; each account only sees its own customers, expenses, and trips.
+- Continue as a guest to explore a preloaded, shared demo workspace without creating an account.
 - Add, edit, and delete expenses linked to a customer.
 - Create group trips, record who paid each shared expense, and calculate per-person balances and suggested repayments.
 - Filter the dashboard by customer.
@@ -35,6 +36,7 @@ npm run seed
 ```
 
 The seed command also creates a demo account: `amit@example.com` / `Demo1234!`. Creating your own account is available from the app's sign-in screen.
+Interviewers can also choose **Continue as guest** on the sign-in screen. The first guest sign-in provisions sample customers, expenses, and a trip automatically. Guest sessions share this demo workspace, so changes are visible to other guests; do not enter personal information.
 
 Start the API and React development server:
 
@@ -65,6 +67,7 @@ npm test
 | GET | `/api/health` | Check that the API is running |
 | POST | `/api/auth/register` | Create an account |
 | POST | `/api/auth/login` | Sign in |
+| POST | `/api/auth/guest` | Open the shared demo workspace |
 | GET | `/api/auth/me` | Get the signed-in account |
 | GET, POST | `/api/customers` | List or create customers |
 | PUT, DELETE | `/api/customers/:id` | Edit or delete a customer |
